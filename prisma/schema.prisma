@@ -1,0 +1,214 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  STAFF
+  VIEWER
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+  PENDING
+  PAID
+  OVERDUE
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      UserRole @default(STAFF)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Property {
+  id                String   @id @default(uuid())
+  name              String
+  ownerName         String
+  tenantName        String?
+  address           String
+  propertyType      String
+  rentAmount        Float
+  status            String
+  furnished         Boolean  @default(false)
+  inventoryStatus   String?
+  propertyCondition String?
+  deliveryDate      DateTime?
+  deliveryTime      String?
+
+  leases           Lease[]
+  payments         Payment[]
+  expenses         Expense[]
+  services         PropertyService[]
+  maintenances     Maintenance[]
+  promissoryNotes  PromissoryNote[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Lease {
+  id                String   @id @default(uuid())
+  propertyId        String
+  property          Property @relation(fields: [propertyId], references: [id])
+
+  ownerName         String
+  tenantName        String
+  contractStartDate DateTime
+  contractEndDate   DateTime
+  monthlyRent       Float
+  commission        Float
+  rentDiscount      Float    @default(0)
+  discountDetail    String?
+  renewal           Boolean  @default(false)
+  requiresInvoice   Boolean  @default(false)
+  status            String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id              String   @id @default(uuid())
+  propertyId      String
+  property        Property @relation(fields: [propertyId], references: [id])
+
+  month           String
+  amount          Float
+  dueDate         DateTime
+  paymentDate     DateTime?
+  paymentMethod   String
+  requiresInvoice Boolean @default(false)
+  status          String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Expense {
+  id             String   @id @default(uuid())
+  propertyId     String
+  property       Property @relation(fields: [propertyId], references: [id])
+
+  category       String
+  concept        String
+  amount         Float
+  date           DateTime
+  paymentStatus  String
+  paymentDueDate DateTime?
+  paymentDate    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PropertyService {
+  id                String   @id @default(uuid())
+  propertyId        String
+  property          Property @relation(fields: [propertyId], references: [id])
+
+  type              String
+  receiptNumber     String?
+  month             String
+  year              Int
+  amount            Float
+  dueDate           DateTime
+  paymentDate       DateTime?
+  accessRenewal     String?
+  accessType        String?
+  accessManagement  String?
+  serviceValidation String
+  status            String
+  notes             String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Maintenance {
+  id              String   @id @default(uuid())
+  propertyId      String
+  property        Property @relation(fields: [propertyId], references: [id])
+
+  propertyType    String
+  description     String
+  area            String
+  cost            Float
+  responsible     String
+  startDate       DateTime
+  nextServiceDate DateTime?
+  status          String
+  notes           String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PromissoryNote {
+  id             String   @id @default(uuid())
+  propertyId     String
+  property       Property @relation(fields: [propertyId], references: [id])
+
+  noteNumber     String
+  totalNotes     Int
+  tenantName     String
+  debtorName     String
+  payTo          String
+  address        String
+  debtorAddress  String
+  phone          String
+  relatedService String
+  coveredMonth   String
+  issueDate      DateTime
+  dueDate        DateTime
+  paymentDate    DateTime?
+  amount         Float
+  interestRate   Float
+  city           String
+  status         String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Reminder {
+  id          String   @id @default(uuid())
+  type        String
+  property    String
+  date        DateTime
+  priority    String
+  description String
+  status      String
+  channel     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ActivityLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  action      String
+  module      String
+  recordId    String?
+  description String
+
+  createdAt DateTime @default(now())
+}
