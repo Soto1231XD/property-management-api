@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+﻿import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -11,7 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true,
   });
 
@@ -28,7 +28,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('PropertyFlow API')
-    .setDescription('Sistema de administración de propiedades')
+    .setDescription('Sistema de administraciÃ³n de propiedades')
     .setVersion('1.0')
     .addBearerAuth(
       {
