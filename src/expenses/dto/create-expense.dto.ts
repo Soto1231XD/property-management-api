@@ -26,4 +26,8 @@ export class CreateExpenseDto {
   @IsOptional()
   @IsDateString()
   paymentDate?: string;
+
+  @IsOptional()
+  @IsString()
+  receiptFileUrl?: string;
 }

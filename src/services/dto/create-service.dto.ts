@@ -54,4 +54,8 @@ export class CreateServiceDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  @IsOptional()
+  @IsString()
+  receiptFileUrl?: string;
 }

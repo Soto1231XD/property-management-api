@@ -44,4 +44,8 @@ export class CreateLeaseDto {
 
   @IsString()
   status: string;
+
+  @IsOptional()
+  @IsString()
+  contractFileUrl?: string;
 }

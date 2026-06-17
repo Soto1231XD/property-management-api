@@ -13,6 +13,12 @@ import { MaintenanceModule } from './maintenance/maintenance.module';
 import { PromissoryNotesModule } from './promissory-notes/promissory-notes.module';
 import { ReportsModule } from './reports/reports.module';
 import { ConfigModule } from '@nestjs/config';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { TrashModule } from './trash/trash.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { MailModule } from './mail/mail.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -30,6 +36,12 @@ import { ConfigModule } from '@nestjs/config';
     MaintenanceModule,
     PromissoryNotesModule,
     ReportsModule,
+    DashboardModule,
+    TrashModule,
+    NotificationsModule,
+    MailModule,
+    ScheduleModule.forRoot(),
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,3 +1,6 @@
+﻿-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
 -- CreateEnum
 CREATE TYPE "public"."UserRole" AS ENUM ('ADMIN', 'STAFF', 'VIEWER');
 
@@ -24,6 +27,7 @@ CREATE TABLE "public"."Property" (
     "ownerName" TEXT NOT NULL,
     "tenantName" TEXT,
     "address" TEXT NOT NULL,
+    "googleMapsUrl" TEXT,
     "propertyType" TEXT NOT NULL,
     "rentAmount" DOUBLE PRECISION NOT NULL,
     "status" TEXT NOT NULL,
@@ -34,6 +38,7 @@ CREATE TABLE "public"."Property" (
     "deliveryTime" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "Property_pkey" PRIMARY KEY ("id")
 );
@@ -53,8 +58,10 @@ CREATE TABLE "public"."Lease" (
     "renewal" BOOLEAN NOT NULL DEFAULT false,
     "requiresInvoice" BOOLEAN NOT NULL DEFAULT false,
     "status" TEXT NOT NULL,
+    "contractFileUrl" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "Lease_pkey" PRIMARY KEY ("id")
 );
@@ -70,8 +77,10 @@ CREATE TABLE "public"."Payment" (
     "paymentMethod" TEXT NOT NULL,
     "requiresInvoice" BOOLEAN NOT NULL DEFAULT false,
     "status" TEXT NOT NULL,
+    "receiptFileUrl" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "Payment_pkey" PRIMARY KEY ("id")
 );
@@ -87,8 +96,10 @@ CREATE TABLE "public"."Expense" (
     "paymentStatus" TEXT NOT NULL,
     "paymentDueDate" TIMESTAMP(3),
     "paymentDate" TIMESTAMP(3),
+    "receiptFileUrl" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "Expense_pkey" PRIMARY KEY ("id")
 );
@@ -110,8 +121,10 @@ CREATE TABLE "public"."PropertyService" (
     "serviceValidation" TEXT NOT NULL,
     "status" TEXT NOT NULL,
     "notes" TEXT,
+    "receiptFileUrl" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "PropertyService_pkey" PRIMARY KEY ("id")
 );
@@ -129,8 +142,10 @@ CREATE TABLE "public"."Maintenance" (
     "nextServiceDate" TIMESTAMP(3),
     "status" TEXT NOT NULL,
     "notes" TEXT,
+    "evidenceFileUrl" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "Maintenance_pkey" PRIMARY KEY ("id")
 );
@@ -156,8 +171,10 @@ CREATE TABLE "public"."PromissoryNote" (
     "interestRate" DOUBLE PRECISION NOT NULL,
     "city" TEXT NOT NULL,
     "status" TEXT NOT NULL,
+    "documentFileUrl" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "PromissoryNote_pkey" PRIMARY KEY ("id")
 );
@@ -191,8 +208,32 @@ CREATE TABLE "public"."ActivityLog" (
     CONSTRAINT "ActivityLog_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "public"."NotificationRead" (
+    "id" TEXT NOT NULL,
+    "notificationId" TEXT NOT NULL,
+    "readAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "NotificationRead_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."NotificationEmailLog" (
+    "id" TEXT NOT NULL,
+    "notificationId" TEXT NOT NULL,
+    "sentAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "NotificationEmailLog_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "public"."User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "NotificationRead_notificationId_key" ON "public"."NotificationRead"("notificationId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "NotificationEmailLog_notificationId_key" ON "public"."NotificationEmailLog"("notificationId");
 
 -- AddForeignKey
 ALTER TABLE "public"."Lease" ADD CONSTRAINT "Lease_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "public"."Property"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -211,3 +252,4 @@ ALTER TABLE "public"."Maintenance" ADD CONSTRAINT "Maintenance_propertyId_fkey" 
 
 -- AddForeignKey
 ALTER TABLE "public"."PromissoryNote" ADD CONSTRAINT "PromissoryNote_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "public"."Property"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+

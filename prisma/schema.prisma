@@ -39,15 +39,16 @@ model User {
 }
 
 model Property {
-  id                String   @id @default(uuid())
+  id                String    @id @default(uuid())
   name              String
   ownerName         String
   tenantName        String?
   address           String
+  googleMapsUrl     String?
   propertyType      String
   rentAmount        Float
   status            String
-  furnished         Boolean  @default(false)
+  furnished         Boolean   @default(false)
   inventoryStatus   String?
   propertyCondition String?
   deliveryDate      DateTime?
@@ -60,8 +61,9 @@ model Property {
   maintenances     Maintenance[]
   promissoryNotes  PromissoryNote[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 model Lease {
@@ -81,8 +83,11 @@ model Lease {
   requiresInvoice   Boolean  @default(false)
   status            String
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  contractFileUrl   String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 model Payment {
@@ -95,11 +100,14 @@ model Payment {
   dueDate         DateTime
   paymentDate     DateTime?
   paymentMethod   String
-  requiresInvoice Boolean @default(false)
+  requiresInvoice Boolean  @default(false)
   status          String
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  receiptFileUrl  String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 model Expense {
@@ -115,8 +123,11 @@ model Expense {
   paymentDueDate DateTime?
   paymentDate    DateTime?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  receiptFileUrl String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 model PropertyService {
@@ -138,8 +149,11 @@ model PropertyService {
   status            String
   notes             String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  receiptFileUrl    String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 model Maintenance {
@@ -157,8 +171,11 @@ model Maintenance {
   status          String
   notes           String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  evidenceFileUrl String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 model PromissoryNote {
@@ -184,8 +201,11 @@ model PromissoryNote {
   city           String
   status         String
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  documentFileUrl String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 model Reminder {
@@ -211,4 +231,16 @@ model ActivityLog {
   description String
 
   createdAt DateTime @default(now())
+}
+
+model NotificationRead {
+  id             String   @id @default(uuid())
+  notificationId String   @unique
+  readAt         DateTime @default(now())
+}
+
+model NotificationEmailLog {
+  id             String   @id @default(uuid())
+  notificationId String   @unique
+  sentAt         DateTime @default(now())
 }

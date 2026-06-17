@@ -32,4 +32,8 @@ export class CreateMaintenanceDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  @IsOptional()
+  @IsString()
+  evidenceFileUrl?: string;
 }

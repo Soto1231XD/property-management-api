@@ -15,8 +15,8 @@ export class PropertiesService {
 
   findAll() {
     return this.prisma.property.findMany({
-      orderBy: {
-        createdAt: 'desc',
+      where: {
+        deletedAt: null,
       },
     });
   }
@@ -35,8 +35,11 @@ export class PropertiesService {
   }
 
   remove(id: string) {
-    return this.prisma.property.delete({
+    return this.prisma.property.update({
       where: { id },
+      data: {
+        deletedAt: new Date(),
+      },
     });
   }
 }

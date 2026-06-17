@@ -31,4 +31,8 @@ export class CreatePaymentDto {
 
   @IsString()
   status: string;
+
+  @IsOptional()
+  @IsString()
+  receiptFileUrl?: string;
 }

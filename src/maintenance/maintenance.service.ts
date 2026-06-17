@@ -3,13 +3,17 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMaintenanceDto } from './dto/create-maintenance.dto';
 import { UpdateMaintenanceDto } from './dto/update-maintenance.dto';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class MaintenanceService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
-  create(data: CreateMaintenanceDto) {
-    return this.prisma.maintenance.create({
+  async create(data: CreateMaintenanceDto) {
+    const maintenance = await this.prisma.maintenance.create({
       data: {
         ...data,
         startDate: new Date(data.startDate),
@@ -18,15 +22,18 @@ export class MaintenanceService {
           : null,
       },
     });
+
+    await this.notificationsService.sendEmailAlerts();
+    return maintenance;
   }
 
   findAll() {
     return this.prisma.maintenance.findMany({
+      where: {
+        deletedAt: null,
+      },
       include: {
         property: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
       },
     });
   }
@@ -40,8 +47,8 @@ export class MaintenanceService {
     });
   }
 
-  update(id: string, data: UpdateMaintenanceDto) {
-    return this.prisma.maintenance.update({
+  async update(id: string, data: UpdateMaintenanceDto) {
+    const maintenance = await this.prisma.maintenance.update({
       where: { id },
       data: {
         ...data,
@@ -51,11 +58,16 @@ export class MaintenanceService {
           : undefined,
       },
     });
+    await this.notificationsService.sendEmailAlerts();
+    return maintenance;
   }
 
   remove(id: string) {
-    return this.prisma.maintenance.delete({
+    return this.prisma.maintenance.update({
       where: { id },
+      data: {
+        deletedAt: new Date(),
+      },
     });
   }
 }

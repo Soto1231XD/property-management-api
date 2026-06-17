@@ -3,28 +3,36 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateLeaseDto } from './dto/create-lease.dto';
 import { UpdateLeaseDto } from './dto/update-lease.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class LeasesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
-  create(data: CreateLeaseDto) {
-    return this.prisma.lease.create({
+  async create(data: CreateLeaseDto) {
+    const lease = await this.prisma.lease.create({
       data: {
         ...data,
         contractStartDate: new Date(data.contractStartDate),
         contractEndDate: new Date(data.contractEndDate),
       },
     });
+
+    await this.notificationsService.sendEmailAlerts();
+
+    return lease;
   }
 
   findAll() {
     return this.prisma.lease.findMany({
+      where: {
+        deletedAt: null,
+      },
       include: {
         property: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
       },
     });
   }
@@ -38,8 +46,8 @@ export class LeasesService {
     });
   }
 
-  update(id: string, data: UpdateLeaseDto) {
-    return this.prisma.lease.update({
+  async update(id: string, data: UpdateLeaseDto) {
+    const lease = await this.prisma.lease.update({
       where: { id },
       data: {
         ...data,
@@ -51,11 +59,18 @@ export class LeasesService {
           : undefined,
       },
     });
+
+    await this.notificationsService.sendEmailAlerts();
+
+    return lease;
   }
 
   remove(id: string) {
-    return this.prisma.lease.delete({
+    return this.prisma.lease.update({
       where: { id },
+      data: {
+        deletedAt: new Date(),
+      },
     });
   }
 }

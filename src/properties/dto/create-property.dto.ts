@@ -14,6 +14,10 @@ export class CreatePropertyDto {
   @IsString()
   address: string;
 
+  @IsOptional()
+  @IsString()
+  googleMapsUrl?: string;
+
   @IsString()
   propertyType: string;
 
